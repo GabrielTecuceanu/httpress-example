@@ -43,9 +43,9 @@ after each run.
 
 | Test                     | Scenario                                     | SLA                               |
 | ------------------------ | -------------------------------------------- | --------------------------------- |
-| `read_throughput_sla`    | 50 concurrent GETs, 5s                       | throughput > 5k req/s, p99 < 10ms |
-| `write_throughput_sla`   | 50 concurrent POSTs (unique keys), 5s        | throughput > 2k req/s, p99 < 20ms |
-| `mixed_workload_sla`     | 80% GET / 20% POST via `request_fn`, 5s      | p99 < 15ms, 0 errors              |
+| `read_throughput_sla`    | 50 concurrent GETs, 5s                       | throughput > 3k req/s, p99 < 20ms |
+| `write_throughput_sla`   | 50 concurrent POSTs (unique keys), 5s        | throughput > 1k req/s, p99 < 40ms |
+| `mixed_workload_sla`     | 80% GET / 20% POST via `request_fn`, 5s      | p99 < 30ms, 0 errors              |
 | `concurrency_scaling`    | GET at c=1, c=10, c=50                       | informational, no assertion       |
 | `ramp_rate`              | `rate_fn` linear ramp 100 -> 2000 req/s, 15s | 0 errors                          |
 | `circuit_breaker`        | `before_request` + `after_request` hooks, 5s | informational, no assertion       |

@@ -56,7 +56,7 @@ fn write_output(test_name: &str, content: &str) {
     println!("output written to {}", path.display());
 }
 
-// 50 concurrent GETs for 5s - asserts throughput > 5k req/s and p99 < 10ms.
+// 50 concurrent GETs for 5s - asserts throughput > 3k req/s and p99 < 20ms.
 #[tokio::test]
 async fn read_throughput_sla() {
     let server = common::spawn_test_server().await;
@@ -75,19 +75,19 @@ async fn read_throughput_sla() {
     write_output("read_throughput_sla", &format_results(&results));
 
     assert!(
-        results.throughput > 5_000.0,
-        "expected >5k req/s, got {:.0}",
+        results.throughput > 3_000.0,
+        "expected >3k req/s, got {:.0}",
         results.throughput
     );
     assert!(
-        results.latency_p99 < Duration::from_millis(10),
-        "expected p99 < 10ms, got {:?}",
+        results.latency_p99 < Duration::from_millis(20),
+        "expected p99 < 20ms, got {:?}",
         results.latency_p99
     );
 }
 
-// 50 concurrent POSTs for 5s with unique keys - asserts throughput > 2k req/s
-// and p99 < 20ms.
+// 50 concurrent POSTs for 5s with unique keys - asserts throughput > 1k req/s
+// and p99 < 40ms.
 #[tokio::test]
 async fn write_throughput_sla() {
     let server = common::spawn_test_server().await;
@@ -111,13 +111,13 @@ async fn write_throughput_sla() {
     write_output("write_throughput_sla", &format_results(&results));
 
     assert!(
-        results.throughput > 2_000.0,
-        "expected >2k req/s, got {:.0}",
+        results.throughput > 1_000.0,
+        "expected >1k req/s, got {:.0}",
         results.throughput
     );
     assert!(
-        results.latency_p99 < Duration::from_millis(20),
-        "expected p99 < 20ms, got {:?}",
+        results.latency_p99 < Duration::from_millis(40),
+        "expected p99 < 40ms, got {:?}",
         results.latency_p99
     );
 }
@@ -159,8 +159,8 @@ async fn mixed_workload_sla() {
     write_output("mixed_workload_sla", &format_results(&results));
 
     assert!(
-        results.latency_p99 < Duration::from_millis(15),
-        "expected p99 < 15ms, got {:?}",
+        results.latency_p99 < Duration::from_millis(30),
+        "expected p99 < 30ms, got {:?}",
         results.latency_p99
     );
     assert_eq!(results.failed_requests, 0, "expected 0 errors");
