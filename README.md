@@ -1,6 +1,6 @@
 # httpress-example
 
-An example project showing how to use [httpress](https://github.com/TecuceanuGabriel/httpress)
+An example project showing how to use [httpress](https://github.com/GabrielTecuceanu/httpress)
 inside a Rust test suite as performance regression tests that fail CI if SLAs are violated.
 
 ## What this demonstrates
@@ -15,11 +15,12 @@ latency spikes, the test fails and CI catches it.
 A simple in-memory key-value store built with axum, used as the system under test.
 
 ```
-GET    /keys          - list all keys
-GET    /keys/:key     - get a value  (404 if missing)
-POST   /keys          - create  { "key": "...", "value": "..." }  (409 if duplicate)
-PUT    /keys/:key     - update  { "value": "..." }  (404 if missing)
-DELETE /keys/:key     - delete  (404 if missing)
+GET    /keys              - list all keys
+GET    /keys/:key         - get a value  (404 if missing)
+GET    /keys/:key/slow    - same as above but sleeps 50ms (used to demonstrate a failing SLA test)
+POST   /keys              - create  { "key": "...", "value": "..." }  (409 if duplicate)
+PUT    /keys/:key         - update  { "value": "..." }  (404 if missing)
+DELETE /keys/:key         - delete  (404 if missing)
 ```
 
 ## Running the tests
@@ -49,6 +50,7 @@ after each run.
 | `ramp_rate`              | `rate_fn` linear ramp 100 -> 2000 req/s, 15s | 0 errors                          |
 | `circuit_breaker`        | `before_request` + `after_request` hooks, 5s | informational, no assertion       |
 | `rate_limited_stability` | steady 1k req/s, 30s                         | 0 errors                          |
+| `slow_endpoint_sla`      | 50 concurrent GETs against `/slow`, 5s       | expected to fail (p99 < 5ms)      |
 
 ### `request_fn`
 

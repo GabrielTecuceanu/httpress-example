@@ -65,6 +65,18 @@ pub async fn update_key(
     StatusCode::OK.into_response()
 }
 
+// Deliberately slow endpoint - sleeps 50ms before responding.
+pub async fn get_key_slow(
+    State(store): State<Store>,
+    Path(key): Path<String>,
+) -> impl IntoResponse {
+    tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    match store.read().await.get(&key).cloned() {
+        Some(value) => Json(ValueResponse { value }).into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
 pub async fn delete_key(State(store): State<Store>, Path(key): Path<String>) -> impl IntoResponse {
     let mut map = store.write().await;
     if map.remove(&key).is_none() {

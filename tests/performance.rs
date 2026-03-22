@@ -275,6 +275,33 @@ async fn circuit_breaker() {
     write_output("circuit_breaker", &content);
 }
 
+// Deliberately failing test - shows what a caught SLA regression looks like.
+// The /keys/{key}/slow endpoint sleeps 50ms per request, so p99 < 5ms will
+// never pass.
+#[tokio::test]
+async fn slow_endpoint_sla() {
+    let server = common::spawn_test_server().await;
+    seed_key(&server.addr, "bench").await;
+
+    let results = BenchmarkBuilder::new()
+        .url(&format!("{}/keys/bench/slow", server.addr))
+        .concurrency(50)
+        .duration(Duration::from_secs(5))
+        .build()
+        .unwrap()
+        .run()
+        .await
+        .unwrap();
+
+    write_output("slow_endpoint_sla", &format_results(&results));
+
+    assert!(
+        results.latency_p99 < Duration::from_millis(5),
+        "expected p99 < 5ms, got {:?} - endpoint is too slow",
+        results.latency_p99
+    );
+}
+
 // Steady 1k req/s for 30s - asserts 0 errors under sustained rate.
 #[tokio::test]
 async fn rate_limited_stability() {

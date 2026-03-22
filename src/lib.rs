@@ -13,5 +13,6 @@ pub fn build_router(store: Store) -> Router {
                 .put(routes::update_key)
                 .delete(routes::delete_key),
         )
+        .route("/keys/{key}/slow", get(routes::get_key_slow))
         .with_state(store)
 }
